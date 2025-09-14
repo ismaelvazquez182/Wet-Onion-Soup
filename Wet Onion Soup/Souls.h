@@ -1,0 +1,5 @@
+#pragma once
+
+#define PLAYER_BASE 0x0067FBF8
+#define GUILD_UNIFORM_OFFSET 0x9F4
+#define GUILD_UNIFORM_LENGTH 6
