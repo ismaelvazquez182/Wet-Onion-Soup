@@ -180,31 +180,6 @@ void MainWindow::Show()
 
         ImGui::End();
 
-        //{
-        //    static float f = 0.0f;
-        //    static int counter = 0;
-
-        //    ImGui::Begin("Hello, world!");
-
-        //    ImGui::Text("This is some useful text.");   
-        //    ImGui::Text("This is some even more useful text.");   
-        //    // Pass a bool as the second argument, when it is toggled, it will toggle the bool
-        //    // ImGui::Checkbox("Another Window", &show_another_window);
-
-        //    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-        //    ImGui::ColorEdit3("clear color", (float*)&clearColor);
-
-        //    if (ImGui::Button("Button"))
-        //        counter++;
-        //    ImGui::SameLine();
-        //    ImGui::Text("counter = %d", counter);
-
-        //    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / m_IO->Framerate, m_IO->Framerate);
-        //    ImGui::End();
-        //}
-
-
-
         ImGui::Render();
         glViewport(0, 0, (int)m_IO->DisplaySize.x, (int)m_IO->DisplaySize.y);
         glClearColor(clearColor.x * clearColor.w, clearColor.y * clearColor.w, clearColor.z * clearColor.w, clearColor.w);
