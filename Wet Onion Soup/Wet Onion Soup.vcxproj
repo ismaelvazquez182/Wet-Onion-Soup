@@ -147,10 +147,12 @@
     <ClCompile Include="..\..\..\..\..\..\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Bridge.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="ProcessManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bridge.h" />
+    <ClInclude Include="MainWindow.h" />
     <ClInclude Include="ProcessManager.h" />
     <ClInclude Include="Souls.h" />
   </ItemGroup>
