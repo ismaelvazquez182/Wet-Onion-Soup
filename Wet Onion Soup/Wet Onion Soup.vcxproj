@@ -24,6 +24,7 @@
     <ProjectGuid>{fa7d1a49-fc36-42f5-85df-d7879d255210}</ProjectGuid>
     <RootNamespace>WetOnionSoup</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Wet Onion Soup</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
