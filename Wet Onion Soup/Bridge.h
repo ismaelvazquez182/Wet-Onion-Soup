@@ -11,8 +11,9 @@ public:
 	~Bridge();
 	bool PutOnUniform(const char* uniform);
 	void Execute();
+	char* GetCharacterName();
 
 private:
-	uintptr_t m_GuildUniformPointer;
+	uintptr_t m_PlayerPointer;
 	ProcessManager *m_Game;
 };
