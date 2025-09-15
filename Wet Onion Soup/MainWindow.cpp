@@ -103,93 +103,92 @@ void MainWindow::Show()
                 done = true;
         }
 
-if (SDL_GetWindowFlags(m_Window) & SDL_WINDOW_MINIMIZED)
-{
-    SDL_Delay(10);
-    continue;
-}
-
-ImGui_ImplOpenGL3_NewFrame();
-ImGui_ImplSDL3_NewFrame();
-ImGui::NewFrame();
-
-ImGui::SetNextWindowSize(ImVec2(1250, 400), ImGuiCond_Once);
-ImGui::Begin("Available Guild Uniforms");
-ImGui::Text("\n%s belongs to these guilds. Pick the one you wish to champion today.\n\n", characterName);
-if (ImGui::BeginTable("Guilds", 5, ImGuiTableFlags_ScrollY | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(1200.f, 150.f))) {
-    ImGui::TableSetupColumn("Uniform", ImGuiTableColumnFlags_WidthFixed, 100.f);
-    ImGui::TableSetupColumn("Guild Name", ImGuiTableColumnFlags_WidthStretch, 650.f);
-    ImGui::TableSetupColumn("Rank", ImGuiTableColumnFlags_WidthFixed, 300.f);
-    ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 50.f);
-    ImGui::TableSetupColumn("Exclusive", ImGuiTableColumnFlags_WidthFixed, 100.f);
-    ImGui::TableHeadersRow();
-
-    for (int i = 0; i < m_GuildList.size(); i++) {
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
-
-        ImGui::PushID(i);
-        bool isSelected = (i == selectedRowIndex);
-        if (ImGui::Selectable((m_GuildList[i].uniform + "##" + std::to_string(i)).c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns)) {
-            selectedRowIndex = i;
+        if (SDL_GetWindowFlags(m_Window) & SDL_WINDOW_MINIMIZED) {
+            SDL_Delay(10);
+            continue;
         }
-        ImGui::PopID();
 
-        ImGui::TableNextColumn();
-        ImGui::Text("%s", m_GuildList[i].guildName.c_str());
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
+        ImGui::NewFrame();
 
-        ImGui::TableNextColumn();
-        ImGui::Text("%s", m_GuildList[i].rank.c_str());
+        ImGui::SetNextWindowSize(ImVec2(1250, 400), ImGuiCond_Once);
+        ImGui::Begin("Available Guild Uniforms");
+        ImGui::Text("\n%s belongs to these guilds. Pick the one you wish to champion today.\n\n", characterName);
+        if (ImGui::BeginTable("Guilds", 5, ImGuiTableFlags_ScrollY | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(1200.f, 150.f))) {
+            ImGui::TableSetupColumn("Uniform", ImGuiTableColumnFlags_WidthFixed, 100.f);
+            ImGui::TableSetupColumn("Guild Name", ImGuiTableColumnFlags_WidthStretch, 650.f);
+            ImGui::TableSetupColumn("Rank", ImGuiTableColumnFlags_WidthFixed, 300.f);
+            ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 50.f);
+            ImGui::TableSetupColumn("Exclusive", ImGuiTableColumnFlags_WidthFixed, 100.f);
+            ImGui::TableHeadersRow();
 
-        ImGui::TableNextColumn();
-        ImGui::Text("%d", m_GuildList[i].id);
+            for (int i = 0; i < m_GuildList.size(); i++) {
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
 
-        ImGui::TableNextColumn();
-        if (m_GuildList[i].exclusive)
-            ImGui::Text("Yes");
-        else
-            ImGui::Text("No");
-    }
-    ImGui::EndTable();
-}
+                ImGui::PushID(i);
+                bool isSelected = (i == selectedRowIndex);
+                if (ImGui::Selectable((m_GuildList[i].uniform + "##" + std::to_string(i)).c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns)) {
+                    selectedRowIndex = i;
+                }
+                ImGui::PopID();
 
-if (ImGui::Button("Put On Uniform")) {
-    if (selectedRowIndex != -1) {
-        bridge->PutOnUniform(m_GuildList[selectedRowIndex].uniform.c_str());
-    }
-    selectedRowIndex = -1;
-}
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", m_GuildList[i].guildName.c_str());
 
-ImGui::SameLine();
-if (ImGui::Button("Remove Uniform")) {
-    bridge->PutOnUniform("");
-}
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", m_GuildList[i].rank.c_str());
 
-ImGui::SameLine();
-if (ImGui::Button("Quit Guild")) {
+                ImGui::TableNextColumn();
+                ImGui::Text("%d", m_GuildList[i].id);
 
-}
+                ImGui::TableNextColumn();
+                if (m_GuildList[i].exclusive)
+                    ImGui::Text("Yes");
+                else
+                    ImGui::Text("No");
+            }
+            ImGui::EndTable();
+        }
 
-ImGui::SameLine();
-if (ImGui::Button("Refresh")) {
-    selectedRowIndex = -1;
-    delete characterName;
-    characterName = bridge->GetCharacterName();
-    bridge->GetGuilds(m_GuildList);
-}
-ImGui::Checkbox("Create New Guild", &m_IsCreateNewGuild);
-ImGui::Checkbox("Change Server", &m_IsChangeServer);
-ImGui::End();
+        if (ImGui::Button("Put On Uniform")) {
+            if (selectedRowIndex != -1) {
+                bridge->PutOnUniform(m_GuildList[selectedRowIndex].uniform.c_str());
+            }
+            selectedRowIndex = -1;
+        }
 
-createNewGuild();
-changeServer();
+        ImGui::SameLine();
+        if (ImGui::Button("Remove Uniform")) {
+            bridge->PutOnUniform("");
+        }
 
-ImGui::Render();
-glViewport(0, 0, (int)m_IO->DisplaySize.x, (int)m_IO->DisplaySize.y);
-glClearColor(clearColor.x * clearColor.w, clearColor.y * clearColor.w, clearColor.z * clearColor.w, clearColor.w);
-glClear(GL_COLOR_BUFFER_BIT);
-ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-SDL_GL_SwapWindow(m_Window);
+        ImGui::SameLine();
+        if (ImGui::Button("Quit Guild")) {
+
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Refresh")) {
+            selectedRowIndex = -1;
+            delete characterName;
+            characterName = bridge->GetCharacterName();
+            bridge->GetGuilds(m_GuildList);
+        }
+        ImGui::Checkbox("Create New Guild", &m_IsCreateNewGuild);
+        ImGui::Checkbox("Change Server", &m_IsChangeServer);
+        ImGui::End();
+
+        createNewGuild();
+        changeServer();
+
+        ImGui::Render();
+        glViewport(0, 0, (int)m_IO->DisplaySize.x, (int)m_IO->DisplaySize.y);
+        glClearColor(clearColor.x * clearColor.w, clearColor.y * clearColor.w, clearColor.z * clearColor.w, clearColor.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        SDL_GL_SwapWindow(m_Window);
     }
 }
 

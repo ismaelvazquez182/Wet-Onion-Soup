@@ -31,7 +31,7 @@ private:
 	bool m_IsExclusive{ false };
 
 	bool m_IsChangeServer{ false };
-	char m_PortNumber[MAX_PORT_DIGITS] = ""; // max port is 65535
+	char m_PortNumber[MAX_PORT_DIGITS] = "";
 	char m_Host[MAX_DOMAIN_LENGTH]{};
 	char m_TempServer[6] = "";
 
