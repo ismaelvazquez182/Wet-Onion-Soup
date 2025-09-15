@@ -1,4 +1,5 @@
 #include "Bridge.h"
+#include "Globals.h"
 #include "GuildData.h"
 #include "MainWindow.h"
 
@@ -85,16 +86,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::Show()
 {
-    m_GuildList.push_back({ "WoS", "We owe Samsyn (ten bucks)", "Member", 1, false });
-    m_GuildList.push_back({ "MWGA", "Make WoS Great Again", "President of the HOA", 2, false });
-    m_GuildList.push_back({ "KoE", "Kings (and queens) of Evergreen", "Propane Master", 0, true });
-
     ImVec4 clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     bool done = false;
     int selectedRowIndex = -1;
     char* characterName = bridge->GetCharacterName();
-    bridge->GetGuilds(m_GuildList);
 
     while (!done) {
         SDL_Event event;
@@ -107,88 +103,150 @@ void MainWindow::Show()
                 done = true;
         }
 
-        if (SDL_GetWindowFlags(m_Window) & SDL_WINDOW_MINIMIZED)
-        {
-            SDL_Delay(10);
-            continue;
+if (SDL_GetWindowFlags(m_Window) & SDL_WINDOW_MINIMIZED)
+{
+    SDL_Delay(10);
+    continue;
+}
+
+ImGui_ImplOpenGL3_NewFrame();
+ImGui_ImplSDL3_NewFrame();
+ImGui::NewFrame();
+
+ImGui::SetNextWindowSize(ImVec2(1250, 400), ImGuiCond_Once);
+ImGui::Begin("Available Guild Uniforms");
+ImGui::Text("\n%s belongs to these guilds. Pick the one you wish to champion today.\n\n", characterName);
+if (ImGui::BeginTable("Guilds", 5, ImGuiTableFlags_ScrollY | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(1200.f, 150.f))) {
+    ImGui::TableSetupColumn("Uniform", ImGuiTableColumnFlags_WidthFixed, 100.f);
+    ImGui::TableSetupColumn("Guild Name", ImGuiTableColumnFlags_WidthStretch, 650.f);
+    ImGui::TableSetupColumn("Rank", ImGuiTableColumnFlags_WidthFixed, 300.f);
+    ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 50.f);
+    ImGui::TableSetupColumn("Exclusive", ImGuiTableColumnFlags_WidthFixed, 100.f);
+    ImGui::TableHeadersRow();
+
+    for (int i = 0; i < m_GuildList.size(); i++) {
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+
+        ImGui::PushID(i);
+        bool isSelected = (i == selectedRowIndex);
+        if (ImGui::Selectable((m_GuildList[i].uniform + "##" + std::to_string(i)).c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns)) {
+            selectedRowIndex = i;
         }
+        ImGui::PopID();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL3_NewFrame();
-        ImGui::NewFrame();
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", m_GuildList[i].guildName.c_str());
 
-        ImGui::SetNextWindowSize(ImVec2(1250, 400), ImGuiCond_Once);
-        ImGui::Begin("Available Guild Uniforms");
-        ImGui::Text("\n%s belongs to these guilds. Pick the one you wish to champion today.\n\n", characterName);
-        if (ImGui::BeginTable("Guilds", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable, ImVec2(1200.f, 0.f))) {
-            ImGui::TableSetupColumn("Uniform", ImGuiTableColumnFlags_WidthFixed, 100.f);
-            ImGui::TableSetupColumn("Guild Name", ImGuiTableColumnFlags_WidthStretch, 650.f);
-            ImGui::TableSetupColumn("Rank", ImGuiTableColumnFlags_WidthFixed, 300.f);
-            ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed, 50.f);
-            ImGui::TableSetupColumn("Exclusive", ImGuiTableColumnFlags_WidthFixed, 100.f);
-            ImGui::TableHeadersRow();
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", m_GuildList[i].rank.c_str());
 
-            for (int i = 0; i < m_GuildList.size(); i++) {
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
+        ImGui::TableNextColumn();
+        ImGui::Text("%d", m_GuildList[i].id);
 
-                ImGui::PushID(i);
-                bool isSelected = (i == selectedRowIndex);
-                if (ImGui::Selectable((m_GuildList[i].uniform + "##" + std::to_string(i)).c_str(), isSelected, ImGuiSelectableFlags_SpanAllColumns)) {
-                    selectedRowIndex = i;
-                }
-                ImGui::PopID();
+        ImGui::TableNextColumn();
+        if (m_GuildList[i].exclusive)
+            ImGui::Text("Yes");
+        else
+            ImGui::Text("No");
+    }
+    ImGui::EndTable();
+}
 
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", m_GuildList[i].guildName.c_str());
+if (ImGui::Button("Put On Uniform")) {
+    if (selectedRowIndex != -1) {
+        bridge->PutOnUniform(m_GuildList[selectedRowIndex].uniform.c_str());
+    }
+    selectedRowIndex = -1;
+}
 
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", m_GuildList[i].rank.c_str());
+ImGui::SameLine();
+if (ImGui::Button("Remove Uniform")) {
+    bridge->PutOnUniform("");
+}
 
-                ImGui::TableNextColumn();
-                ImGui::Text("%d", m_GuildList[i].id);
+ImGui::SameLine();
+if (ImGui::Button("Quit Guild")) {
 
-                ImGui::TableNextColumn();
-                if (m_GuildList[i].exclusive) 
-                    ImGui::Text("Yes");
-                else 
-                    ImGui::Text("No");
+}
+
+ImGui::SameLine();
+if (ImGui::Button("Refresh")) {
+    selectedRowIndex = -1;
+    delete characterName;
+    characterName = bridge->GetCharacterName();
+    bridge->GetGuilds(m_GuildList);
+}
+ImGui::Checkbox("Create New Guild", &m_IsCreateNewGuild);
+ImGui::Checkbox("Change Server", &m_IsChangeServer);
+ImGui::End();
+
+createNewGuild();
+changeServer();
+
+ImGui::Render();
+glViewport(0, 0, (int)m_IO->DisplaySize.x, (int)m_IO->DisplaySize.y);
+glClearColor(clearColor.x * clearColor.w, clearColor.y * clearColor.w, clearColor.z * clearColor.w, clearColor.w);
+glClear(GL_COLOR_BUFFER_BIT);
+ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+SDL_GL_SwapWindow(m_Window);
+    }
+}
+
+void MainWindow::createNewGuild()
+{
+    if (m_IsCreateNewGuild) {
+        ImGui::Begin("Create New Guild", &m_IsCreateNewGuild);
+        ImGui::InputText("Uniform", m_Uniform, IM_ARRAYSIZE(m_Uniform));
+        ImGui::InputText("Guild Name", m_GuildName, IM_ARRAYSIZE(m_GuildName));
+        ImGui::Checkbox("Exclusive", &m_IsExclusive);
+        if (ImGui::Button("Create")) {
+            if (!bridge->CreateGuild(m_GuildList, m_Uniform, m_GuildName, m_IsExclusive)) {
+                strcpy_s(m_TempGuild, MAX_UNIFORM_LENGTH, m_Uniform);
+                strcpy_s(m_Uniform, 1, "");
+                strcpy_s(m_GuildName, 1, "");
+                m_IsExclusive = false;
             }
-            ImGui::EndTable();
-        }
-
-        if (ImGui::Button("Put On Uniform")) {
-            if (selectedRowIndex != -1) {
-                bridge->PutOnUniform(m_GuildList[selectedRowIndex].uniform.c_str());
+            else {
+                strcpy_s(m_TempGuild, 1, "");
+                strcpy_s(m_Uniform, 1, "");
+                strcpy_s(m_GuildName, 1, "");
+                m_IsExclusive = false;
             }
-            selectedRowIndex = -1;
         }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Remove Uniform")) {
-            bridge->PutOnUniform("");
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Quit Guild")) {
-            
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Refresh")) {
-            selectedRowIndex = -1;
-            delete characterName;
-            characterName = bridge->GetCharacterName();
-            bridge->GetGuilds(m_GuildList);
-        }
-
+        if (strcmp(m_TempGuild, "") != 0)
+            ImGui::Text("%s has been created!", m_TempGuild);
         ImGui::End();
+        if (!m_IsCreateNewGuild) {
+            strcpy_s(m_TempGuild, MAX_UNIFORM_LENGTH, "");
+            m_IsExclusive = false;
+        }
+    }
+}
 
-        ImGui::Render();
-        glViewport(0, 0, (int)m_IO->DisplaySize.x, (int)m_IO->DisplaySize.y);
-        glClearColor(clearColor.x * clearColor.w, clearColor.y * clearColor.w, clearColor.z * clearColor.w, clearColor.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        SDL_GL_SwapWindow(m_Window);
+void MainWindow::changeServer()
+{
+    if (m_IsChangeServer) {
+        ImGui::Begin("Change Server", &m_IsChangeServer);
+        ImGui::InputText("IP Address/Domain", m_Host, IM_ARRAYSIZE(m_Host));
+        ImGui::InputText("Port Number", m_PortNumber, IM_ARRAYSIZE(m_PortNumber));
+        if (ImGui::Button("Change")) {
+            if (!bridge->ChangeServer(m_Host, m_PortNumber)) {
+                strcpy_s(m_TempServer, MAX_PORT_DIGITS, m_PortNumber);  
+                strcpy_s(m_Host, 1, "");
+                strcpy_s(m_PortNumber, 1, "");
+            }
+            else {
+                strcpy_s(m_TempServer, 1, "");
+                strcpy_s(m_Host, 1, "");
+                strcpy_s(m_PortNumber, 1, "");
+            }
+        }
+        if (strcmp(m_TempServer, "") != 0)
+            ImGui::Text("Server has been changed!", m_TempGuild);
+        ImGui::End();
+        if (!m_IsChangeServer) {
+            strcpy_s(m_TempServer, 1, "");
+        }
     }
 }

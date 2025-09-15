@@ -15,6 +15,8 @@ public:
 	bool PutOnUniform(const char* uniform);
 	char* GetCharacterName();
 	bool GetGuilds(std::vector<GuildData> &guildList);
+	bool CreateGuild(std::vector<GuildData>& guildList, const char* uniform, const char* guildName, bool isExclusive);
+	bool ChangeServer(const char* newHost, const char* newPort);
 
 private:
 	uintptr_t m_PlayerPointer;

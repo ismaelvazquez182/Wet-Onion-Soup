@@ -1,9 +1,12 @@
 #include "Bridge.h"
+#include "Globals.h"
 #include "GuildData.h"
 #include "ProcessManager.h"
 #include "NetworkManager.h"
 #include "Souls.h"
 
+#include <cstdlib>
+#include <cstring>
 #include <sstream>
 
 Bridge::~Bridge() { 
@@ -42,14 +45,49 @@ bool Bridge::GetGuilds(std::vector<GuildData> &guildList)
 {
 	std::wstringstream ss;
 
-	// action to perform
-	// soul id
-	// character name
-	// /fetch&3472&BobbyHill
 	ss << L"/" << L"fetch&" << std::to_wstring(getSoulID()) << L"&" << m_CurrentCharacter;
 	std::string response = m_Net->SendGetRequest(ss.str());
 
 	if (response == "") return true;
 
+	if (guildList.empty()) {
+		guildList.push_back({ "WoS", "We owe Samsyn (ten bucks)", "Member", 1, false });
+		guildList.push_back({ "MWGA", "Make WoS Great Again", "President of the HOA", 2, false });
+		guildList.push_back({ "KoE", "Kings (and queens) of Evergreen", "Propane Master", 0, true });
+	}
+
+	return false;
+}
+
+bool Bridge::CreateGuild(std::vector<GuildData>& guildList, const char* uniform, const char* guildName, bool isExclusive)
+{
+	if (std::strcmp(uniform, "") == 0 || std::strcmp(guildName, "") == 0) {
+		return true;
+	}
+
+	std::wstringstream ss;
+
+	ss << L"/" << L"create&" << std::to_wstring(getSoulID()) << L"&" << m_CurrentCharacter << L"&" << uniform << L"&" << guildName << L"&" << isExclusive;
+	std::string response = m_Net->SendGetRequest(ss.str());
+
+	if (response == "") return true;
+	guildList.push_back({ uniform, guildName, "Leader", 0, isExclusive});
+	GetGuilds(guildList);
+	return false;
+}
+
+bool Bridge::ChangeServer(const char* newHost, const char* newPort)
+{
+	if (std::strcmp(newHost, "") == 0 || std::strcmp(newPort, "") == 0) {
+		return true;
+	}
+
+	unsigned int port = std::atoi(newPort);
+	if (port < MIN_PORT || port > MAX_PORT) {
+		return true;
+	}
+	wchar_t host[MAX_DOMAIN_LENGTH];
+	mbstowcs_s(0, host, MAX_DOMAIN_LENGTH, newHost, MAX_DOMAIN_LENGTH);
+	m_Net->SetHost(host, port);
 	return false;
 }
