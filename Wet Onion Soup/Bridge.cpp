@@ -18,7 +18,7 @@ Bridge::Bridge() : m_CurrentCharacter{nullptr}
 {
 	m_Game = new ProcessManager(L"Souls.exe");
 	m_Game->Read(reinterpret_cast<LPCVOID>(PLAYER_BASE), &m_PlayerPointer, sizeof(m_PlayerPointer));
-	m_Net = new NetworkManager(L"192.168.111.135");
+	m_Net = new NetworkManager(L"192.168.111.136");
 }
 
 bool Bridge::PutOnUniform(const char* uniform)
@@ -50,6 +50,7 @@ bool Bridge::GetGuilds(std::vector<GuildData> &guildList)
 
 	if (response == "") return true;
 
+	// remove this after server is implemented
 	if (guildList.empty()) {
 		guildList.push_back({ "WoS", "We owe Samsyn (ten bucks)", "Member", 1, false });
 		guildList.push_back({ "MWGA", "Make WoS Great Again", "President of the HOA", 2, false });
@@ -71,6 +72,7 @@ bool Bridge::CreateGuild(std::vector<GuildData>& guildList, const char* uniform,
 	std::string response = m_Net->SendGetRequest(ss.str());
 
 	if (response == "") return true;
+	// remove this after server is implemented
 	guildList.push_back({ uniform, guildName, "Leader", 0, isExclusive});
 	GetGuilds(guildList);
 	return false;
@@ -89,5 +91,25 @@ bool Bridge::ChangeServer(const char* newHost, const char* newPort)
 	wchar_t host[MAX_DOMAIN_LENGTH];
 	mbstowcs_s(0, host, MAX_DOMAIN_LENGTH, newHost, MAX_DOMAIN_LENGTH);
 	m_Net->SetHost(host, port);
+	return false;
+}
+
+bool Bridge::QuitGuild(std::vector<GuildData>& guildList, const char* guildToQuit)
+{
+	std::wstringstream ss;
+
+	ss << L"/" << L"quit&" << std::to_wstring(getSoulID()) << L"&" << m_CurrentCharacter << L"&" << guildToQuit;
+	std::string response = m_Net->SendGetRequest(ss.str());
+
+	if (response == "") return true;
+
+	// remove this after server is implemented
+	for (int i = 0; i < guildList.size(); i++) {
+		if (guildList[i].uniform == guildToQuit) {
+			guildList.erase(guildList.begin() + i);
+			break;
+		}
+	}
+
 	return false;
 }

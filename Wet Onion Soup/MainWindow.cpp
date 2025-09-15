@@ -166,13 +166,13 @@ void MainWindow::Show()
 
         ImGui::SameLine();
         if (ImGui::Button("Quit Guild")) {
-
+            bridge->QuitGuild(m_GuildList, m_GuildList[selectedRowIndex].uniform.c_str());
         }
 
         ImGui::SameLine();
         if (ImGui::Button("Refresh")) {
             selectedRowIndex = -1;
-            delete characterName;
+            delete[] characterName;
             characterName = bridge->GetCharacterName();
             bridge->GetGuilds(m_GuildList);
         }
@@ -180,6 +180,7 @@ void MainWindow::Show()
         ImGui::Checkbox("Change Server", &m_IsChangeServer);
         ImGui::End();
 
+        // secondary windows
         createNewGuild();
         changeServer();
 
@@ -195,6 +196,7 @@ void MainWindow::Show()
 void MainWindow::createNewGuild()
 {
     if (m_IsCreateNewGuild) {
+        ImGui::SetNextWindowSize(ImVec2(400.f, 205.f), ImGuiCond_Once);
         ImGui::Begin("Create New Guild", &m_IsCreateNewGuild);
         ImGui::InputText("Uniform", m_Uniform, IM_ARRAYSIZE(m_Uniform));
         ImGui::InputText("Guild Name", m_GuildName, IM_ARRAYSIZE(m_GuildName));
@@ -226,6 +228,7 @@ void MainWindow::createNewGuild()
 void MainWindow::changeServer()
 {
     if (m_IsChangeServer) {
+        ImGui::SetNextWindowSize(ImVec2(615.f, 170.f), ImGuiCond_Once);
         ImGui::Begin("Change Server", &m_IsChangeServer);
         ImGui::InputText("IP Address/Domain", m_Host, IM_ARRAYSIZE(m_Host));
         ImGui::InputText("Port Number", m_PortNumber, IM_ARRAYSIZE(m_PortNumber));

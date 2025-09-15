@@ -15,7 +15,7 @@ std::string NetworkManager::SendGetRequest(std::wstring request)
     HINTERNET hSession = WinHttpOpen(L"Bobby Hill's Wet Onion Soup/1.0", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
 
     if (!hSession) {
-        MessageBoxA(0, "Failed to create session.", "SendGetRequest", MB_OK);
+        MessageBoxA(0, "Initialization failed.", "Session Error", MB_OK | MB_ICONERROR);
         return "";
     }
 
@@ -23,7 +23,7 @@ std::string NetworkManager::SendGetRequest(std::wstring request)
     HINTERNET hConnect = WinHttpConnect(hSession, m_Host.c_str(), m_PortNumber, 0);
 
     if (!hConnect) {
-        MessageBoxA(0, "Failed to connect.", "SendGetRequest", MB_OK);
+        MessageBoxA(0, "Unable to connect with the server.", "Connection Error", MB_OK | MB_ICONERROR);
         WinHttpCloseHandle(hSession);
         return "";
     }
@@ -32,7 +32,7 @@ std::string NetworkManager::SendGetRequest(std::wstring request)
     HINTERNET hRequest = WinHttpOpenRequest(hConnect, L"GET", request.c_str(), NULL, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, 0);
 
     if (!hRequest) {
-        MessageBoxA(0, "Failed to create HTTP request handle.", "SendGetRequest", MB_OK);
+        MessageBoxA(0, "Unable to create an HTTP request handle.", "Handle Creation Error", MB_OK | MB_ICONERROR);
         WinHttpCloseHandle(hConnect);
         WinHttpCloseHandle(hSession);
         return "";
@@ -44,7 +44,7 @@ std::string NetworkManager::SendGetRequest(std::wstring request)
     std::stringstream response;
 
     if (!bResults) {
-        MessageBoxA(0, "Failed to send the request.", "SendGetRequest", MB_OK);
+        MessageBoxA(0, "Something went wrong when trying to send a request to the server.", "Request Error", MB_OK | MB_ICONERROR);
         return "";
     } else {
         // Receive the response
@@ -55,7 +55,7 @@ std::string NetworkManager::SendGetRequest(std::wstring request)
             do {
                 // Check how much data is available
                 if (!WinHttpQueryDataAvailable(hRequest, &dwSize)) {
-                    MessageBoxA(0, "Failed to check how much data is available", "SendGetRequest", MB_OK);
+                    MessageBoxA(0, "Unable to query the available data", "Response Error", MB_OK | MB_ICONERROR);
                     break;
                 }
                 if (dwSize == 0) break;
@@ -73,7 +73,7 @@ std::string NetworkManager::SendGetRequest(std::wstring request)
             } while (dwSize > 0);
         }
         else {
-            MessageBoxA(0, "Failed to receive a request.", "SendGetRequest", MB_OK);
+            MessageBoxA(0, "The server did no respond.", "Response Error", MB_OK | MB_ICONERROR);
         }
     }
 

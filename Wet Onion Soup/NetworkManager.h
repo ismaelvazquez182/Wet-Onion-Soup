@@ -5,7 +5,7 @@
 class NetworkManager
 {
 public:
-	NetworkManager(std::wstring host, unsigned int portNumber=80);
+	NetworkManager(std::wstring host, unsigned int portNumber=3472);
 	~NetworkManager();
 
 	// sends a get request and returns the response
