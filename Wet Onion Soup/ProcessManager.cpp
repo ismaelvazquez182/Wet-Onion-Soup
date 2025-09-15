@@ -6,16 +6,14 @@ ProcessManager::~ProcessManager() { CloseHandle(m_Handle); }
 
 ProcessManager::ProcessManager(const wchar_t* exe, bool should_begin_obtaining_handle) : m_ProcName(exe), m_Handle{nullptr}
 {
-    if (should_begin_obtaining_handle) {
+    if (should_begin_obtaining_handle) 
         ObtainHandle();
-    }
 }
 
 void ProcessManager::ObtainHandle()
 {
-    while (!getProcessHandle()) {
+    while (!getProcessHandle()) 
         Sleep(3000);
-    }
 }
 
 bool ProcessManager::getProcessHandle()

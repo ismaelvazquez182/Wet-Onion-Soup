@@ -7,15 +7,7 @@ struct SDL_Window;
 typedef struct SDL_GLContextState* SDL_GLContext;
 struct ImGuiIO;
 class Bridge;
-
-struct GuildData {
-	std::string uniform;
-	std::string guildName;
-	std::string rank;
-	unsigned int id;
-	bool exclusive;
-	bool selected;
-};
+struct GuildData;
 
 class MainWindow
 {

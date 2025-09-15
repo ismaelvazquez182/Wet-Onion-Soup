@@ -1,4 +1,5 @@
 #include "Bridge.h"
+#include "GuildData.h"
 #include "MainWindow.h"
 
 #include "imgui.h"
@@ -93,6 +94,8 @@ void MainWindow::Show()
     bool done = false;
     int selectedRowIndex = -1;
     char* characterName = bridge->GetCharacterName();
+    bridge->GetGuilds(m_GuildList);
+
     while (!done) {
         SDL_Event event;
         while (SDL_PollEvent(&event))
@@ -176,6 +179,7 @@ void MainWindow::Show()
             selectedRowIndex = -1;
             delete characterName;
             characterName = bridge->GetCharacterName();
+            bridge->GetGuilds(m_GuildList);
         }
 
         ImGui::End();
