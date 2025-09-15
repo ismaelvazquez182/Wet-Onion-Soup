@@ -1,4 +1,4 @@
-
+![Screenshot of Wet Onion Soup](https://raw.githubusercontent.com/ismaelvazquez182/Wet-Onion-Soup/refs/heads/main/wet-onion-soup-screenshot.png)
 
 ## Basic Build Instructions
 * [Download SDL3 Devel 3.2.22](https://github.com/libsdl-org/SDL/releases/download/release-3.2.22/SDL3-devel-3.2.22-VC.zip) and unzip the folder to your C drive. Rename the root folder to SDL3. 
